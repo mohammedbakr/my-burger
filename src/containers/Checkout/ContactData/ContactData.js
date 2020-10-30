@@ -107,11 +107,12 @@ class ContactData extends Component {
     const order = {
       ingredients: this.props.ingredients,
       price: this.props.price.toFixed(2),
-      orderDtata: formData
+      orderDtata: formData,
+      userId: this.props.userId
     }
 
     // reach to server
-    this.props.onOrderBurger(order)
+    this.props.onOrderBurger(order, this.props.token)
   }
 
   inputChangeHandler = (e, element) => {
@@ -148,6 +149,17 @@ class ContactData extends Component {
 
     if (rules.maxLength) {
       isValid = value.length <= rules.maxLength && isValid
+    }
+
+    if (rules.isEmail) {
+      // eslint-disable-next-line
+      const pattern = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      isValid = pattern.test(value) && isValid
+    }
+
+    if (rules.isNumeric) {
+      const pattern = /^\d+$/
+      isValid = pattern.test(value) && isValid
     }
 
     return isValid
@@ -198,13 +210,15 @@ const mapStateToProps = state => {
   return {
     ingredients: state.burgerBuilder.ingredients,
     price: state.burgerBuilder.totalPrice,
-    loading: state.order.loading
+    loading: state.order.loading,
+    token: state.auth.token,
+    userId: state.auth.userId
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    onOrderBurger: (orderDtata) => dispatch(actionCreators.purchaseBurger(orderDtata))
+    onOrderBurger: (orderDtata, token) => dispatch(actionCreators.purchaseBurger(orderDtata, token))
   }
 }
 
