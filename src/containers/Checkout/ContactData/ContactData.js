@@ -9,6 +9,7 @@ import Spinner from '../../../components/UI/Spinner/Spinner'
 import Input from '../../../components/UI/Input/Input'
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler'
 import * as actionCreators from '../../../store/actions'
+import { updateObject, checkValidity } from '../../../shared/utility'
 
 class ContactData extends Component {
   state = {
@@ -116,12 +117,14 @@ class ContactData extends Component {
   }
 
   inputChangeHandler = (e, element) => {
-    const updatedOrderForm = {...this.state.orderForm}
-    const updatedFormElement = {...updatedOrderForm[element]}
-    updatedFormElement.value = e.target.value
-    updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedFormElement.validation)
-    updatedFormElement.touched = true
-    updatedOrderForm[element] = updatedFormElement
+    const updatedFormElement = updateObject(this.state.orderForm[element], {
+      value: e.target.value,
+      valid: checkValidity(e.target.value, this.state.orderForm[element].validation),
+      touched: true
+    })
+    const updatedOrderForm = updateObject(this.state.orderForm, {
+      [element]: updatedFormElement
+    })
 
     let formIsValid = true
     for (const key in updatedOrderForm) {
@@ -129,40 +132,6 @@ class ContactData extends Component {
     }
 
     this.setState({orderForm: updatedOrderForm, formIsValid: formIsValid})
-  }
-
-  checkValidity = (value, rules) => {
-    let isValid = true
-
-    if (!rules) {
-      return true
-    }
-
-    if (rules.required) {
-      // returns true or false
-      isValid = value.trim() !== '' && isValid;
-    }
-
-    if (rules.minLength) {
-      isValid = value.length >= rules.minLength && isValid
-    }
-
-    if (rules.maxLength) {
-      isValid = value.length <= rules.maxLength && isValid
-    }
-
-    if (rules.isEmail) {
-      // eslint-disable-next-line
-      const pattern = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      isValid = pattern.test(value) && isValid
-    }
-
-    if (rules.isNumeric) {
-      const pattern = /^\d+$/
-      isValid = pattern.test(value) && isValid
-    }
-
-    return isValid
   }
 
   render() {

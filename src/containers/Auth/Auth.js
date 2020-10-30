@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
+
 import Button from '../../components/UI/Button/Button'
 import Input from '../../components/UI/Input/Input'
 import Spinner from '../../components/UI/Spinner/Spinner'
-
 import classes from './Auth.module.css'
-
 import * as actionCreators from '../../store/actions/index'
-import { Redirect } from 'react-router-dom'
+import { updateObject, checkValidity } from '../../shared/utility'
 
 class Auth extends Component {
   state = {
@@ -52,12 +52,13 @@ class Auth extends Component {
   }
 
   inputChangeHandler = (e, element) => {
-    const updatedControls = {...this.state.controls}
-    const updatedControlsElement = {...updatedControls[element]}
-    updatedControlsElement.value = e.target.value
-    updatedControlsElement.valid = this.checkValidity(updatedControlsElement.value, updatedControlsElement.validation)
-    updatedControlsElement.touched = true
-    updatedControls[element] = updatedControlsElement
+    const updatedControls = updateObject(this.state.controls, {
+      [element]: updateObject(this.state.controls[element], {
+        value: e.target.value,
+        valid: checkValidity(e.target.value, this.state.controls[element].validation),
+        touched: true
+      })
+    })
 
     let formIsValid = true
     for (const key in updatedControls) {
@@ -67,34 +68,34 @@ class Auth extends Component {
     this.setState({controls: updatedControls, formIsValid: formIsValid})
   }
 
-  checkValidity = (value, rules) => {
-    let isValid = true
+  // checkValidity = (value, rules) => {
+  //   let isValid = true
 
-    if (!rules) {
-      return true
-    }
+  //   if (!rules) {
+  //     return true
+  //   }
 
-    if (rules.required) {
-      // returns true or false
-      isValid = value.trim() !== '' && isValid;
-    }
+  //   if (rules.required) {
+  //     // returns true or false
+  //     isValid = value.trim() !== '' && isValid;
+  //   }
 
-    if (rules.minLength) {
-      isValid = value.length >= rules.minLength && isValid
-    }
+  //   if (rules.minLength) {
+  //     isValid = value.length >= rules.minLength && isValid
+  //   }
 
-    if (rules.maxLength) {
-      isValid = value.length <= rules.maxLength && isValid
-    }
+  //   if (rules.maxLength) {
+  //     isValid = value.length <= rules.maxLength && isValid
+  //   }
 
-    if (rules.isEmail) {
-      // eslint-disable-next-line
-      const pattern = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      isValid = pattern.test(value) && isValid
-    }
+  //   if (rules.isEmail) {
+  //     // eslint-disable-next-line
+  //     const pattern = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  //     isValid = pattern.test(value) && isValid
+  //   }
 
-    return isValid
-  }
+  //   return isValid
+  // }
 
   submitHandler = (e) => {
     e.preventDefault()
