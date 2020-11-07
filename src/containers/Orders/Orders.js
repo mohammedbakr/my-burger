@@ -7,10 +7,10 @@ import Spinner from '../../components/UI/Spinner/Spinner'
 import * as actionCreators from '../../store/actions'
 
 function Orders (props) {
+  const { onFetchOrders, token, userId } = props
   useEffect(() => {
-    props.onFetchOrders(props.token, props.userId)
-    // eslint-disable-next-line
-  }, []) // [] means it will run only one time
+    onFetchOrders(token, userId)
+  }, [onFetchOrders, token, userId])
 
   let orders = <Spinner />
   if (!props.loading) {

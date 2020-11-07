@@ -43,12 +43,13 @@ function Auth (props) {
   const [formIsValid, setFormIsValid] = useState(false)
   const [isSignup, setIsSignup] = useState(true)
 
+  const { buildingBurger, authRedirectPath, onSetAuthRedirectPath } = props
+
   useEffect(() => {
-    if (!props.buildingBurger && props.authRedirectPath !== '/') {
-      props.onSetAuthRedirectPath()
+    if (!buildingBurger && authRedirectPath !== '/') {
+      onSetAuthRedirectPath()
     }
-    // eslint-disable-next-line
-  }, [])
+  }, [buildingBurger, authRedirectPath, onSetAuthRedirectPath])
 
   const inputChangeHandler = (e, element) => {
     const updatedControls = updateObject(controls, {
@@ -109,7 +110,7 @@ function Auth (props) {
 
   let authRedirect = null
   if (props.isAuth) {
-    authRedirect = <Redirect to={props.authRedirectPath} />
+    authRedirect = <Redirect to={authRedirectPath} />
   }
 
   return (

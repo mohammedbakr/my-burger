@@ -13,10 +13,10 @@ const asyncOrders = React.lazy(() => import('./containers/Orders/Orders'));
 const asyncAuth = React.lazy(() => import('./containers/Auth/Auth'));
 
 function App (props) {
+  const { onAuthCheckState } = props
   useEffect(() => {
-    props.onAuthCheckState()
-    // eslint-disable-next-line
-  }, [])
+    onAuthCheckState()
+  }, [onAuthCheckState])
 
   let routes = (
     <Switch>
