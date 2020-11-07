@@ -1,4 +1,4 @@
-import React, { Component, Suspense } from 'react'
+import React, { useEffect, Suspense } from 'react'
 import { Redirect, Route, Switch, withRouter } from "react-router-dom";
 import { connect } from 'react-redux';
 
@@ -12,45 +12,42 @@ const asyncCheckout = React.lazy(() => import('./containers/Checkout/Checkout'))
 const asyncOrders = React.lazy(() => import('./containers/Orders/Orders'));
 const asyncAuth = React.lazy(() => import('./containers/Auth/Auth'));
 
-export class App extends Component {
-  componentDidMount() {
-    this.props.onAuthCheckState()
+function App (props) {
+  useEffect(() => {
+    props.onAuthCheckState()
+    // eslint-disable-next-line
+  }, [])
+
+  let routes = (
+    <Switch>
+      <Route path="/auth" component={asyncAuth} />
+      <Route exact path="/" component={BurgerBuilder} />
+      <Redirect to="/" />
+    </Switch>
+  )
+
+  if (props.isAuth) {
+    routes = (
+      <Switch>
+        <Route path="/checkout" component={asyncCheckout} />
+        <Route path="/orders" component={asyncOrders} />
+        <Route path="/logout" component={Logout} />
+        <Route path="/auth" component={asyncAuth} />
+        <Route path="/" exact component={BurgerBuilder} />
+        <Redirect to="/" />
+      </Switch>
+    )
   }
 
-  render() {
-    let routes = (
-      <Suspense fallback={<Spinner />}>
-        <Switch>
-          <Route path="/auth" component={asyncAuth} />
-          <Route exact path="/" component={BurgerBuilder} />
-          <Redirect to="/" />
-        </Switch>
-      </Suspense>
-    )
-
-    if (this.props.isAuth) {
-      routes = (
+  return (
+    <div>
+      <Layout>
         <Suspense fallback={<Spinner />}>
-          <Switch>
-            <Route path="/checkout" component={asyncCheckout} />
-            <Route path="/orders" component={asyncOrders} />
-            <Route path="/logout" component={Logout} />
-            <Route path="/auth" component={asyncAuth} />
-            <Route path="/" exact component={BurgerBuilder} />
-            <Redirect to="/" />
-          </Switch>
-        </Suspense>
-      )
-    }
-
-    return (
-      <div>
-        <Layout>
-          {routes}            
-        </Layout>
-      </div>
-    )
-  }
+          {routes}
+        </Suspense>           
+      </Layout>
+    </div>
+  )
 }
 
 const mapStateToProps = state => {
